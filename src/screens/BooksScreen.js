@@ -13,16 +13,19 @@ import {
 
 import { searchBooks } from "../api/booksApi";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function BooksScreen({ navigation }) {
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState([]);
   const [filter, setFilter] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const { colors } = useTheme();
+  const { language } = useLanguage();
+
+  const isHebrew = language === "he";
 
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -47,13 +50,13 @@ export default function BooksScreen({ navigation }) {
     const results = await searchBooks(query);
 
     setBooks(results);
-
     setRefreshing(false);
   };
 
   const filteredBooks = books.filter((book) => {
     const title = book.volumeInfo.title || "";
-    const authors = book.volumeInfo.authors?.join(" ") || "";
+    const authors =
+      book.volumeInfo.authors?.join(" ") || "";
 
     const filterText = filter.toLowerCase();
 
@@ -104,7 +107,10 @@ export default function BooksScreen({ navigation }) {
               { color: colors.secondaryText },
             ]}
           >
-            {info.authors?.join(", ") || "Unknown author"}
+            {info.authors?.join(", ") ||
+              (isHebrew
+                ? "מחבר לא ידוע"
+                : "Unknown author")}
           </Text>
         </View>
       </Pressable>
@@ -124,7 +130,7 @@ export default function BooksScreen({ navigation }) {
           { color: colors.text },
         ]}
       >
-        Find a Book
+        {isHebrew ? "חיפוש ספרים" : "Find a Book"}
       </Text>
 
       <View style={styles.searchContainer}>
@@ -137,7 +143,11 @@ export default function BooksScreen({ navigation }) {
               borderColor: colors.border,
             },
           ]}
-          placeholder="Search Google Books..."
+          placeholder={
+            isHebrew
+              ? "חיפוש ב-Google Books..."
+              : "Search Google Books..."
+          }
           placeholderTextColor={colors.secondaryText}
           value={query}
           onChangeText={setQuery}
@@ -157,7 +167,7 @@ export default function BooksScreen({ navigation }) {
               { color: colors.buttonText },
             ]}
           >
-            Search
+            {isHebrew ? "חיפוש" : "Search"}
           </Text>
         </Pressable>
       </View>
@@ -172,7 +182,11 @@ export default function BooksScreen({ navigation }) {
               borderColor: colors.border,
             },
           ]}
-          placeholder="Filter results by title or author..."
+          placeholder={
+            isHebrew
+              ? "סינון לפי שם הספר או המחבר..."
+              : "Filter results by title or author..."
+          }
           placeholderTextColor={colors.secondaryText}
           value={filter}
           onChangeText={setFilter}
@@ -204,7 +218,9 @@ export default function BooksScreen({ navigation }) {
                   { color: colors.secondaryText },
                 ]}
               >
-                No books match this filter.
+                {isHebrew
+                  ? "לא נמצאו ספרים המתאימים לסינון."
+                  : "No books match this filter."}
               </Text>
             ) : null
           }

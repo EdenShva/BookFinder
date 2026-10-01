@@ -10,7 +10,9 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 const USER_KEY = "registeredUser";
 
@@ -21,6 +23,9 @@ export default function ProfileScreen({ navigation }) {
   const [message, setMessage] = useState("");
 
   const { darkMode, toggleTheme, colors } = useTheme();
+  const { language, changeLanguage } = useLanguage();
+
+  const isHebrew = language === "he";
 
   useEffect(() => {
     loadProfile();
@@ -28,7 +33,8 @@ export default function ProfileScreen({ navigation }) {
 
   const loadProfile = async () => {
     try {
-      const savedUser = await AsyncStorage.getItem(USER_KEY);
+      const savedUser =
+        await AsyncStorage.getItem(USER_KEY);
 
       if (savedUser) {
         const user = JSON.parse(savedUser);
@@ -38,18 +44,30 @@ export default function ProfileScreen({ navigation }) {
         setPassword(user.password || "");
       }
     } catch (error) {
-      setMessage("Failed to load profile.");
+      setMessage(
+        isHebrew
+          ? "טעינת הפרופיל נכשלה."
+          : "Failed to load profile."
+      );
     }
   };
 
   const handleSave = async () => {
     if (!name.trim() || !email.trim()) {
-      setMessage("Please fill in all fields.");
+      setMessage(
+        isHebrew
+          ? "יש למלא את כל השדות."
+          : "Please fill in all fields."
+      );
       return;
     }
 
     if (!email.includes("@")) {
-      setMessage("Please enter a valid email.");
+      setMessage(
+        isHebrew
+          ? "יש להזין כתובת אימייל תקינה."
+          : "Please enter a valid email."
+      );
       return;
     }
 
@@ -66,9 +84,18 @@ export default function ProfileScreen({ navigation }) {
       );
 
       setEmail(updatedUser.email);
-      setMessage("Profile saved successfully!");
+
+      setMessage(
+        isHebrew
+          ? "הפרופיל נשמר בהצלחה!"
+          : "Profile saved successfully!"
+      );
     } catch (error) {
-      setMessage("Failed to save profile.");
+      setMessage(
+        isHebrew
+          ? "שמירת הפרופיל נכשלה."
+          : "Failed to save profile."
+      );
     }
   };
 
@@ -79,7 +106,11 @@ export default function ProfileScreen({ navigation }) {
 
       navigation.getParent()?.replace("Login");
     } catch (error) {
-      setMessage("Failed to delete profile.");
+      setMessage(
+        isHebrew
+          ? "מחיקת הפרופיל נכשלה."
+          : "Failed to delete profile."
+      );
     }
   };
 
@@ -89,7 +120,11 @@ export default function ProfileScreen({ navigation }) {
 
       navigation.getParent()?.replace("Login");
     } catch (error) {
-      setMessage("Failed to logout.");
+      setMessage(
+        isHebrew
+          ? "ההתנתקות נכשלה."
+          : "Failed to logout."
+      );
     }
   };
 
@@ -103,10 +138,13 @@ export default function ProfileScreen({ navigation }) {
       <Text
         style={[
           styles.title,
-          { color: colors.text },
+          {
+            color: colors.text,
+            textAlign: isHebrew ? "right" : "left",
+          },
         ]}
       >
-        My Profile
+        {isHebrew ? "הפרופיל שלי" : "My Profile"}
       </Text>
 
       <View style={styles.themeRow}>
@@ -116,7 +154,7 @@ export default function ProfileScreen({ navigation }) {
             { color: colors.text },
           ]}
         >
-          Dark Mode
+          {isHebrew ? "מצב כהה" : "Dark Mode"}
         </Text>
 
         <Switch
@@ -127,11 +165,77 @@ export default function ProfileScreen({ navigation }) {
 
       <Text
         style={[
-          styles.label,
+          styles.sectionTitle,
           { color: colors.text },
         ]}
       >
-        Name
+        {isHebrew ? "שפה" : "Language"}
+      </Text>
+
+      <View style={styles.languageContainer}>
+        <Pressable
+          style={[
+            styles.languageButton,
+            {
+              borderColor: colors.border,
+              backgroundColor:
+                language === "en"
+                  ? colors.button
+                  : colors.card,
+            },
+          ]}
+          onPress={() => changeLanguage("en")}
+        >
+          <Text
+            style={{
+              color:
+                language === "en"
+                  ? colors.buttonText
+                  : colors.text,
+              fontWeight: "bold",
+            }}
+          >
+            English
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={[
+            styles.languageButton,
+            {
+              borderColor: colors.border,
+              backgroundColor:
+                language === "he"
+                  ? colors.button
+                  : colors.card,
+            },
+          ]}
+          onPress={() => changeLanguage("he")}
+        >
+          <Text
+            style={{
+              color:
+                language === "he"
+                  ? colors.buttonText
+                  : colors.text,
+              fontWeight: "bold",
+            }}
+          >
+            עברית
+          </Text>
+        </Pressable>
+      </View>
+
+      <Text
+        style={[
+          styles.label,
+          {
+            color: colors.text,
+            textAlign: isHebrew ? "right" : "left",
+          },
+        ]}
+      >
+        {isHebrew ? "שם" : "Name"}
       </Text>
 
       <TextInput
@@ -141,21 +245,25 @@ export default function ProfileScreen({ navigation }) {
             backgroundColor: colors.card,
             color: colors.text,
             borderColor: colors.border,
+            textAlign: isHebrew ? "right" : "left",
           },
         ]}
         value={name}
         onChangeText={setName}
-        placeholder="Name"
+        placeholder={isHebrew ? "שם" : "Name"}
         placeholderTextColor={colors.secondaryText}
       />
 
       <Text
         style={[
           styles.label,
-          { color: colors.text },
+          {
+            color: colors.text,
+            textAlign: isHebrew ? "right" : "left",
+          },
         ]}
       >
-        Email
+        {isHebrew ? "אימייל" : "Email"}
       </Text>
 
       <TextInput
@@ -169,7 +277,7 @@ export default function ProfileScreen({ navigation }) {
         ]}
         value={email}
         onChangeText={setEmail}
-        placeholder="Email"
+        placeholder={isHebrew ? "אימייל" : "Email"}
         placeholderTextColor={colors.secondaryText}
         keyboardType="email-address"
         autoCapitalize="none"
@@ -188,7 +296,9 @@ export default function ProfileScreen({ navigation }) {
             { color: colors.buttonText },
           ]}
         >
-          Save Profile
+          {isHebrew
+            ? "שמור פרופיל"
+            : "Save Profile"}
         </Text>
       </Pressable>
 
@@ -205,7 +315,7 @@ export default function ProfileScreen({ navigation }) {
             { color: colors.text },
           ]}
         >
-          Logout
+          {isHebrew ? "התנתק" : "Logout"}
         </Text>
       </Pressable>
 
@@ -214,7 +324,9 @@ export default function ProfileScreen({ navigation }) {
         onPress={handleDelete}
       >
         <Text style={styles.deleteText}>
-          Delete Profile
+          {isHebrew
+            ? "מחק פרופיל"
+            : "Delete Profile"}
         </Text>
       </Pressable>
 
@@ -222,7 +334,8 @@ export default function ProfileScreen({ navigation }) {
         <Text
           style={[
             styles.message,
-            message.includes("successfully")
+            message.includes("successfully") ||
+            message.includes("בהצלחה")
               ? styles.success
               : styles.error,
           ]}
@@ -256,6 +369,26 @@ const styles = StyleSheet.create({
   themeText: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+
+  languageContainer: {
+    flexDirection: "row",
+    marginBottom: 25,
+  },
+
+  languageButton: {
+    flex: 1,
+    padding: 12,
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginRight: 8,
   },
 
   label: {

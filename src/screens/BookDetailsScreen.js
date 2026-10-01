@@ -9,22 +9,35 @@ import {
 } from "react-native";
 
 import * as Speech from "expo-speech";
+
 import { useFavorites } from "../context/FavoritesContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function BookDetailsScreen({ route }) {
   const { book } = route.params;
   const info = book.volumeInfo;
 
-  const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const {
+    favorites,
+    addFavorite,
+    removeFavorite,
+  } = useFavorites();
+
   const { colors } = useTheme();
+  const { language } = useLanguage();
+
+  const isHebrew = language === "he";
 
   const isFavorite = favorites.some(
     (favorite) => favorite.id === book.id
   );
 
   const description =
-    info.description || "No description available.";
+    info.description ||
+    (isHebrew
+      ? "אין תיאור זמין."
+      : "No description available.");
 
   const handleReadDescription = () => {
     Speech.stop();
@@ -69,7 +82,8 @@ export default function BookDetailsScreen({ route }) {
           { color: colors.secondaryText },
         ]}
       >
-        {info.authors?.join(", ") || "Unknown author"}
+        {info.authors?.join(", ") ||
+          (isHebrew ? "מחבר לא ידוע" : "Unknown author")}
       </Text>
 
       {info.publishedDate && (
@@ -79,7 +93,8 @@ export default function BookDetailsScreen({ route }) {
             { color: colors.secondaryText },
           ]}
         >
-          Published: {info.publishedDate}
+          {isHebrew ? "פורסם:" : "Published:"}{" "}
+          {info.publishedDate}
         </Text>
       )}
 
@@ -90,7 +105,8 @@ export default function BookDetailsScreen({ route }) {
             { color: colors.secondaryText },
           ]}
         >
-          Pages: {info.pageCount}
+          {isHebrew ? "עמודים:" : "Pages:"}{" "}
+          {info.pageCount}
         </Text>
       )}
 
@@ -117,7 +133,9 @@ export default function BookDetailsScreen({ route }) {
               { color: colors.text },
             ]}
           >
-            🔊 Read Description
+            {isHebrew
+              ? "🔊 הקרא תיאור"
+              : "🔊 Read Description"}
           </Text>
         </Pressable>
 
@@ -126,7 +144,9 @@ export default function BookDetailsScreen({ route }) {
           onPress={handleStopReading}
         >
           <Text style={styles.stopButtonText}>
-            Stop Reading
+            {isHebrew
+              ? "עצור הקראה"
+              : "Stop Reading"}
           </Text>
         </Pressable>
       </View>
@@ -149,8 +169,12 @@ export default function BookDetailsScreen({ route }) {
           ]}
         >
           {isFavorite
-            ? "Remove from Favorites"
-            : "Add to Favorites"}
+            ? isHebrew
+              ? "הסר מהמועדפים"
+              : "Remove from Favorites"
+            : isHebrew
+              ? "הוסף למועדפים"
+              : "Add to Favorites"}
         </Text>
       </Pressable>
     </ScrollView>

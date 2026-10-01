@@ -8,7 +8,9 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 const USER_KEY = "registeredUser";
 
@@ -18,40 +20,62 @@ export default function LoginScreen({ navigation }) {
   const [message, setMessage] = useState("");
 
   const { colors } = useTheme();
+  const { language } = useLanguage();
+
+  const isHebrew = language === "he";
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
-      setMessage("Please enter email and password.");
+      setMessage(
+        isHebrew
+          ? "יש להזין אימייל וסיסמה."
+          : "Please enter email and password."
+      );
       return;
     }
 
     try {
-      const savedUser = await AsyncStorage.getItem(USER_KEY);
+      const savedUser =
+        await AsyncStorage.getItem(USER_KEY);
 
       if (!savedUser) {
-        setMessage("No registered user found. Please register first.");
+        setMessage(
+          isHebrew
+            ? "לא נמצא משתמש רשום. יש להירשם תחילה."
+            : "No registered user found. Please register first."
+        );
         return;
       }
 
       const user = JSON.parse(savedUser);
-
       const enteredEmail = email.trim().toLowerCase();
 
       if (
         enteredEmail !== user.email ||
         password !== user.password
       ) {
-        setMessage("Incorrect email or password.");
+        setMessage(
+          isHebrew
+            ? "האימייל או הסיסמה שגויים."
+            : "Incorrect email or password."
+        );
         return;
       }
 
       setMessage("");
 
-      await AsyncStorage.setItem("isLoggedIn", "true");
+      await AsyncStorage.setItem(
+        "isLoggedIn",
+        "true"
+      );
 
       navigation.replace("Main");
     } catch (error) {
-      setMessage("Login failed. Please try again.");
+      setMessage(
+        isHebrew
+          ? "ההתחברות נכשלה. נסי שוב."
+          : "Login failed. Please try again."
+      );
     }
   };
 
@@ -77,7 +101,9 @@ export default function LoginScreen({ navigation }) {
           { color: colors.secondaryText },
         ]}
       >
-        Login to your account
+        {isHebrew
+          ? "התחברי לחשבון שלך"
+          : "Login to your account"}
       </Text>
 
       <TextInput
@@ -89,7 +115,7 @@ export default function LoginScreen({ navigation }) {
             borderColor: colors.border,
           },
         ]}
-        placeholder="Email"
+        placeholder={isHebrew ? "אימייל" : "Email"}
         placeholderTextColor={colors.secondaryText}
         value={email}
         onChangeText={setEmail}
@@ -106,7 +132,7 @@ export default function LoginScreen({ navigation }) {
             borderColor: colors.border,
           },
         ]}
-        placeholder="Password"
+        placeholder={isHebrew ? "סיסמה" : "Password"}
         placeholderTextColor={colors.secondaryText}
         value={password}
         onChangeText={setPassword}
@@ -132,12 +158,14 @@ export default function LoginScreen({ navigation }) {
             { color: colors.buttonText },
           ]}
         >
-          Login
+          {isHebrew ? "התחברות" : "Login"}
         </Text>
       </Pressable>
 
       <Pressable
-        onPress={() => navigation.navigate("Register")}
+        onPress={() =>
+          navigation.navigate("Register")
+        }
       >
         <Text
           style={[
@@ -145,7 +173,9 @@ export default function LoginScreen({ navigation }) {
             { color: colors.text },
           ]}
         >
-          Don't have an account? Register
+          {isHebrew
+            ? "אין לך חשבון? הירשמי"
+            : "Don't have an account? Register"}
         </Text>
       </Pressable>
     </View>

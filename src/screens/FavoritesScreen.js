@@ -10,10 +10,14 @@ import {
 
 import { useFavorites } from "../context/FavoritesContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function FavoritesScreen({ navigation }) {
   const { favorites, removeFavorite } = useFavorites();
   const { colors } = useTheme();
+  const { language } = useLanguage();
+
+  const isHebrew = language === "he";
 
   const renderBook = ({ item }) => {
     const info = item.volumeInfo;
@@ -31,7 +35,9 @@ export default function FavoritesScreen({ navigation }) {
         <Pressable
           style={styles.bookContent}
           onPress={() =>
-            navigation.navigate("BookDetails", { book: item })
+            navigation.navigate("BookDetails", {
+              book: item,
+            })
           }
         >
           {info.imageLinks?.thumbnail && (
@@ -57,7 +63,10 @@ export default function FavoritesScreen({ navigation }) {
                 { color: colors.secondaryText },
               ]}
             >
-              {info.authors?.join(", ") || "Unknown author"}
+              {info.authors?.join(", ") ||
+                (isHebrew
+                  ? "מחבר לא ידוע"
+                  : "Unknown author")}
             </Text>
           </View>
         </Pressable>
@@ -75,7 +84,7 @@ export default function FavoritesScreen({ navigation }) {
               { color: colors.text },
             ]}
           >
-            Remove
+            {isHebrew ? "הסר" : "Remove"}
           </Text>
         </Pressable>
       </View>
@@ -95,7 +104,7 @@ export default function FavoritesScreen({ navigation }) {
           { color: colors.text },
         ]}
       >
-        My Favorites
+        {isHebrew ? "המועדפים שלי" : "My Favorites"}
       </Text>
 
       {favorites.length === 0 ? (
@@ -105,7 +114,9 @@ export default function FavoritesScreen({ navigation }) {
             { color: colors.secondaryText },
           ]}
         >
-          You don't have any favorite books yet.
+          {isHebrew
+            ? "עדיין אין לך ספרים מועדפים."
+            : "You don't have any favorite books yet."}
         </Text>
       ) : (
         <FlatList

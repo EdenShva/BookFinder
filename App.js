@@ -16,6 +16,10 @@ import {
   useTheme,
 } from "./src/context/ThemeContext";
 
+import {
+  LanguageProvider,
+} from "./src/context/LanguageContext";
+
 const Stack = createNativeStackNavigator();
 
 function AppContent() {
@@ -111,7 +115,9 @@ function AppContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

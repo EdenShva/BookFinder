@@ -8,7 +8,9 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 const USER_KEY = "registeredUser";
 
@@ -19,20 +21,35 @@ export default function RegisterScreen({ navigation }) {
   const [message, setMessage] = useState("");
 
   const { colors } = useTheme();
+  const { language } = useLanguage();
+
+  const isHebrew = language === "he";
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
-      setMessage("Please fill in all fields.");
+      setMessage(
+        isHebrew
+          ? "יש למלא את כל השדות."
+          : "Please fill in all fields."
+      );
       return;
     }
 
     if (!email.includes("@")) {
-      setMessage("Please enter a valid email.");
+      setMessage(
+        isHebrew
+          ? "יש להזין כתובת אימייל תקינה."
+          : "Please enter a valid email."
+      );
       return;
     }
 
     if (password.length < 6) {
-      setMessage("Password must contain at least 6 characters.");
+      setMessage(
+        isHebrew
+          ? "הסיסמה חייבת להכיל לפחות 6 תווים."
+          : "Password must contain at least 6 characters."
+      );
       return;
     }
 
@@ -49,10 +66,13 @@ export default function RegisterScreen({ navigation }) {
       );
 
       setMessage("");
-
       navigation.replace("Login");
     } catch (error) {
-      setMessage("Failed to create account.");
+      setMessage(
+        isHebrew
+          ? "יצירת החשבון נכשלה."
+          : "Failed to create account."
+      );
     }
   };
 
@@ -69,7 +89,7 @@ export default function RegisterScreen({ navigation }) {
           { color: colors.text },
         ]}
       >
-        Create Account
+        {isHebrew ? "יצירת חשבון" : "Create Account"}
       </Text>
 
       <Text
@@ -78,7 +98,9 @@ export default function RegisterScreen({ navigation }) {
           { color: colors.secondaryText },
         ]}
       >
-        Join BookFinder
+        {isHebrew
+          ? "הצטרפי ל-BookFinder"
+          : "Join BookFinder"}
       </Text>
 
       <TextInput
@@ -90,7 +112,7 @@ export default function RegisterScreen({ navigation }) {
             borderColor: colors.border,
           },
         ]}
-        placeholder="Name"
+        placeholder={isHebrew ? "שם" : "Name"}
         placeholderTextColor={colors.secondaryText}
         value={name}
         onChangeText={setName}
@@ -105,7 +127,7 @@ export default function RegisterScreen({ navigation }) {
             borderColor: colors.border,
           },
         ]}
-        placeholder="Email"
+        placeholder={isHebrew ? "אימייל" : "Email"}
         placeholderTextColor={colors.secondaryText}
         value={email}
         onChangeText={setEmail}
@@ -122,7 +144,7 @@ export default function RegisterScreen({ navigation }) {
             borderColor: colors.border,
           },
         ]}
-        placeholder="Password"
+        placeholder={isHebrew ? "סיסמה" : "Password"}
         placeholderTextColor={colors.secondaryText}
         value={password}
         onChangeText={setPassword}
@@ -148,7 +170,7 @@ export default function RegisterScreen({ navigation }) {
             { color: colors.buttonText },
           ]}
         >
-          Register
+          {isHebrew ? "הרשמה" : "Register"}
         </Text>
       </Pressable>
 
@@ -161,7 +183,9 @@ export default function RegisterScreen({ navigation }) {
             { color: colors.text },
           ]}
         >
-          Already have an account? Login
+          {isHebrew
+            ? "כבר יש לך חשבון? התחברי"
+            : "Already have an account? Login"}
         </Text>
       </Pressable>
     </View>
