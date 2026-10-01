@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "../context/ThemeContext";
 
 const USER_KEY = "registeredUser";
 
@@ -15,6 +16,8 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  const { colors } = useTheme();
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -53,13 +56,41 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>BookFinder</Text>
-      <Text style={styles.subtitle}>Login to your account</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          { color: colors.text },
+        ]}
+      >
+        BookFinder
+      </Text>
+
+      <Text
+        style={[
+          styles.subtitle,
+          { color: colors.secondaryText },
+        ]}
+      >
+        Login to your account
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="Email"
+        placeholderTextColor={colors.secondaryText}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -67,8 +98,16 @@ export default function LoginScreen({ navigation }) {
       />
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="Password"
+        placeholderTextColor={colors.secondaryText}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -81,16 +120,31 @@ export default function LoginScreen({ navigation }) {
       )}
 
       <Pressable
-        style={styles.button}
+        style={[
+          styles.button,
+          { backgroundColor: colors.button },
+        ]}
         onPress={handleLogin}
       >
-        <Text style={styles.buttonText}>Login</Text>
+        <Text
+          style={[
+            styles.buttonText,
+            { color: colors.buttonText },
+          ]}
+        >
+          Login
+        </Text>
       </Pressable>
 
       <Pressable
         onPress={() => navigation.navigate("Register")}
       >
-        <Text style={styles.registerText}>
+        <Text
+          style={[
+            styles.registerText,
+            { color: colors.text },
+          ]}
+        >
           Don't have an account? Register
         </Text>
       </Pressable>
@@ -103,7 +157,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 24,
-    backgroundColor: "#f5f5f5",
   },
 
   title: {
@@ -120,12 +173,10 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "white",
     padding: 14,
     borderRadius: 8,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: "#ddd",
   },
 
   errorMessage: {
@@ -136,14 +187,12 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#333",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
   },
 
   buttonText: {
-    color: "white",
     fontSize: 16,
     fontWeight: "bold",
   },

@@ -10,12 +10,14 @@ import {
 
 import * as Speech from "expo-speech";
 import { useFavorites } from "../context/FavoritesContext";
+import { useTheme } from "../context/ThemeContext";
 
 export default function BookDetailsScreen({ route }) {
   const { book } = route.params;
   const info = book.volumeInfo;
 
   const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const { colors } = useTheme();
 
   const isFavorite = favorites.some(
     (favorite) => favorite.id === book.id
@@ -39,7 +41,12 @@ export default function BookDetailsScreen({ route }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
+    >
       {info.imageLinks?.thumbnail && (
         <Image
           source={{ uri: info.imageLinks.thumbnail }}
@@ -47,34 +54,69 @@ export default function BookDetailsScreen({ route }) {
         />
       )}
 
-      <Text style={styles.title}>{info.title}</Text>
+      <Text
+        style={[
+          styles.title,
+          { color: colors.text },
+        ]}
+      >
+        {info.title}
+      </Text>
 
-      <Text style={styles.author}>
+      <Text
+        style={[
+          styles.author,
+          { color: colors.secondaryText },
+        ]}
+      >
         {info.authors?.join(", ") || "Unknown author"}
       </Text>
 
       {info.publishedDate && (
-        <Text style={styles.detail}>
+        <Text
+          style={[
+            styles.detail,
+            { color: colors.secondaryText },
+          ]}
+        >
           Published: {info.publishedDate}
         </Text>
       )}
 
       {info.pageCount && (
-        <Text style={styles.detail}>
+        <Text
+          style={[
+            styles.detail,
+            { color: colors.secondaryText },
+          ]}
+        >
           Pages: {info.pageCount}
         </Text>
       )}
 
-      <Text style={styles.description}>
+      <Text
+        style={[
+          styles.description,
+          { color: colors.text },
+        ]}
+      >
         {description}
       </Text>
 
       <View style={styles.speechButtons}>
         <Pressable
-          style={styles.speechButton}
+          style={[
+            styles.speechButton,
+            { borderColor: colors.border },
+          ]}
           onPress={handleReadDescription}
         >
-          <Text style={styles.speechButtonText}>
+          <Text
+            style={[
+              styles.speechButtonText,
+              { color: colors.text },
+            ]}
+          >
             🔊 Read Description
           </Text>
         </Pressable>
@@ -90,14 +132,22 @@ export default function BookDetailsScreen({ route }) {
       </View>
 
       <Pressable
-        style={styles.button}
+        style={[
+          styles.button,
+          { backgroundColor: colors.button },
+        ]}
         onPress={() =>
           isFavorite
             ? removeFavorite(book.id)
             : addFavorite(book)
         }
       >
-        <Text style={styles.buttonText}>
+        <Text
+          style={[
+            styles.buttonText,
+            { color: colors.buttonText },
+          ]}
+        >
           {isFavorite
             ? "Remove from Favorites"
             : "Add to Favorites"}
@@ -109,9 +159,9 @@ export default function BookDetailsScreen({ route }) {
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     padding: 24,
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
   },
 
   cover: {
@@ -152,7 +202,6 @@ const styles = StyleSheet.create({
 
   speechButton: {
     borderWidth: 1,
-    borderColor: "#333",
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -175,14 +224,12 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#333",
     paddingVertical: 14,
     paddingHorizontal: 30,
     borderRadius: 8,
   },
 
   buttonText: {
-    color: "white",
     fontWeight: "bold",
   },
 });

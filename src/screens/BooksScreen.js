@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import { searchBooks } from "../api/booksApi";
+import { useTheme } from "../context/ThemeContext";
 
 export default function BooksScreen({ navigation }) {
   const [query, setQuery] = useState("");
@@ -20,6 +21,8 @@ export default function BooksScreen({ navigation }) {
 
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  const { colors } = useTheme();
 
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -65,7 +68,13 @@ export default function BooksScreen({ navigation }) {
 
     return (
       <Pressable
-        style={styles.bookCard}
+        style={[
+          styles.bookCard,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         onPress={() =>
           navigation.navigate("BookDetails", {
             book: item,
@@ -80,11 +89,21 @@ export default function BooksScreen({ navigation }) {
         )}
 
         <View style={styles.bookInfo}>
-          <Text style={styles.bookTitle}>
+          <Text
+            style={[
+              styles.bookTitle,
+              { color: colors.text },
+            ]}
+          >
             {info.title}
           </Text>
 
-          <Text style={styles.author}>
+          <Text
+            style={[
+              styles.author,
+              { color: colors.secondaryText },
+            ]}
+          >
             {info.authors?.join(", ") || "Unknown author"}
           </Text>
         </View>
@@ -93,23 +112,51 @@ export default function BooksScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Find a Book</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          { color: colors.text },
+        ]}
+      >
+        Find a Book
+      </Text>
 
       <View style={styles.searchContainer}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.card,
+              color: colors.text,
+              borderColor: colors.border,
+            },
+          ]}
           placeholder="Search Google Books..."
+          placeholderTextColor={colors.secondaryText}
           value={query}
           onChangeText={setQuery}
           onSubmitEditing={handleSearch}
         />
 
         <Pressable
-          style={styles.button}
+          style={[
+            styles.button,
+            { backgroundColor: colors.button },
+          ]}
           onPress={handleSearch}
         >
-          <Text style={styles.buttonText}>
+          <Text
+            style={[
+              styles.buttonText,
+              { color: colors.buttonText },
+            ]}
+          >
             Search
           </Text>
         </Pressable>
@@ -117,8 +164,16 @@ export default function BooksScreen({ navigation }) {
 
       {books.length > 0 && (
         <TextInput
-          style={styles.filterInput}
+          style={[
+            styles.filterInput,
+            {
+              backgroundColor: colors.card,
+              color: colors.text,
+              borderColor: colors.border,
+            },
+          ]}
           placeholder="Filter results by title or author..."
+          placeholderTextColor={colors.secondaryText}
           value={filter}
           onChangeText={setFilter}
         />
@@ -143,7 +198,12 @@ export default function BooksScreen({ navigation }) {
           }
           ListEmptyComponent={
             books.length > 0 && filter !== "" ? (
-              <Text style={styles.emptyText}>
+              <Text
+                style={[
+                  styles.emptyText,
+                  { color: colors.secondaryText },
+                ]}
+              >
                 No books match this filter.
               </Text>
             ) : null
@@ -158,7 +218,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
   },
 
   title: {
@@ -174,30 +233,24 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
-    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     marginRight: 10,
   },
 
   button: {
-    backgroundColor: "#333",
     justifyContent: "center",
     paddingHorizontal: 20,
     borderRadius: 8,
   },
 
   buttonText: {
-    color: "white",
     fontWeight: "bold",
   },
 
   filterInput: {
-    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
@@ -220,10 +273,10 @@ const styles = StyleSheet.create({
 
   bookCard: {
     flexDirection: "row",
-    backgroundColor: "white",
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
+    borderWidth: 1,
   },
 
   cover: {

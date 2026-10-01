@@ -5,12 +5,12 @@ import {
   TextInput,
   Pressable,
   StyleSheet,
-  Image,
   ScrollView,
+  Switch,
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as ImagePicker from "expo-image-picker";
+import { useTheme } from "../context/ThemeContext";
 
 const USER_KEY = "registeredUser";
 
@@ -18,8 +18,9 @@ export default function ProfileScreen({ navigation }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [profileImage, setProfileImage] = useState(null);
   const [message, setMessage] = useState("");
+
+  const { darkMode, toggleTheme, colors } = useTheme();
 
   useEffect(() => {
     loadProfile();
@@ -35,38 +36,9 @@ export default function ProfileScreen({ navigation }) {
         setName(user.name || "");
         setEmail(user.email || "");
         setPassword(user.password || "");
-        setProfileImage(user.profileImage || null);
       }
     } catch (error) {
       setMessage("Failed to load profile.");
-    }
-  };
-
-  const handleTakePhoto = async () => {
-    try {
-      const permission =
-        await ImagePicker.requestCameraPermissionsAsync();
-
-      if (!permission.granted) {
-        setMessage("Camera permission is required.");
-        return;
-      }
-
-      const result =
-        await ImagePicker.launchCameraAsync({
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 0.7,
-        });
-
-      if (!result.canceled) {
-        const imageUri = result.assets[0].uri;
-
-        setProfileImage(imageUri);
-        setMessage("Photo added. Save your profile.");
-      }
-    } catch (error) {
-      setMessage("Failed to open camera.");
     }
   };
 
@@ -85,7 +57,6 @@ export default function ProfileScreen({ navigation }) {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password: password,
-      profileImage: profileImage,
     };
 
     try {
@@ -124,66 +95,116 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <ScrollView
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
     >
-      <Text style={styles.title}>My Profile</Text>
-
-      {profileImage ? (
-        <Image
-          source={{ uri: profileImage }}
-          style={styles.profileImage}
-        />
-      ) : (
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.placeholderText}>
-            No Photo
-          </Text>
-        </View>
-      )}
-
-      <Pressable
-        style={styles.cameraButton}
-        onPress={handleTakePhoto}
+      <Text
+        style={[
+          styles.title,
+          { color: colors.text },
+        ]}
       >
-        <Text style={styles.cameraButtonText}>
-          Take Profile Photo
-        </Text>
-      </Pressable>
+        My Profile
+      </Text>
 
-      <Text style={styles.label}>Name</Text>
+      <View style={styles.themeRow}>
+        <Text
+          style={[
+            styles.themeText,
+            { color: colors.text },
+          ]}
+        >
+          Dark Mode
+        </Text>
+
+        <Switch
+          value={darkMode}
+          onValueChange={toggleTheme}
+        />
+      </View>
+
+      <Text
+        style={[
+          styles.label,
+          { color: colors.text },
+        ]}
+      >
+        Name
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border,
+          },
+        ]}
         value={name}
         onChangeText={setName}
         placeholder="Name"
+        placeholderTextColor={colors.secondaryText}
       />
 
-      <Text style={styles.label}>Email</Text>
+      <Text
+        style={[
+          styles.label,
+          { color: colors.text },
+        ]}
+      >
+        Email
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border,
+          },
+        ]}
         value={email}
         onChangeText={setEmail}
         placeholder="Email"
+        placeholderTextColor={colors.secondaryText}
         keyboardType="email-address"
         autoCapitalize="none"
       />
 
       <Pressable
-        style={styles.button}
+        style={[
+          styles.button,
+          { backgroundColor: colors.button },
+        ]}
         onPress={handleSave}
       >
-        <Text style={styles.buttonText}>
+        <Text
+          style={[
+            styles.buttonText,
+            { color: colors.buttonText },
+          ]}
+        >
           Save Profile
         </Text>
       </Pressable>
 
       <Pressable
-        style={styles.logoutButton}
+        style={[
+          styles.logoutButton,
+          { borderColor: colors.border },
+        ]}
         onPress={handleLogout}
       >
-        <Text style={styles.logoutText}>
+        <Text
+          style={[
+            styles.logoutText,
+            { color: colors.text },
+          ]}
+        >
           Logout
         </Text>
       </Pressable>
@@ -203,7 +224,7 @@ export default function ProfileScreen({ navigation }) {
             styles.message,
             message.includes("successfully")
               ? styles.success
-              : styles.info,
+              : styles.error,
           ]}
         >
           {message}
@@ -217,7 +238,6 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 24,
-    backgroundColor: "#f5f5f5",
   },
 
   title: {
@@ -226,40 +246,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    alignSelf: "center",
-    marginBottom: 12,
-  },
-
-  imagePlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#ddd",
-    alignSelf: "center",
-    justifyContent: "center",
+  themeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
-  },
-
-  placeholderText: {
-    color: "#666",
-  },
-
-  cameraButton: {
-    alignSelf: "center",
-    borderWidth: 1,
-    borderColor: "#333",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
     marginBottom: 25,
   },
 
-  cameraButtonText: {
+  themeText: {
+    fontSize: 16,
     fontWeight: "bold",
   },
 
@@ -270,23 +265,19 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     marginBottom: 18,
   },
 
   button: {
-    backgroundColor: "#333",
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
   },
 
   buttonText: {
-    color: "white",
     fontWeight: "bold",
   },
 
@@ -295,7 +286,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#333",
     marginTop: 12,
   },
 
@@ -325,7 +315,7 @@ const styles = StyleSheet.create({
     color: "green",
   },
 
-  info: {
+  error: {
     color: "#b00020",
   },
 });

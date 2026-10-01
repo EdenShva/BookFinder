@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "../context/ThemeContext";
 
 const USER_KEY = "registeredUser";
 
@@ -16,6 +17,8 @@ export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  const { colors } = useTheme();
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
@@ -54,20 +57,56 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-      <Text style={styles.subtitle}>Join BookFinder</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          { color: colors.text },
+        ]}
+      >
+        Create Account
+      </Text>
+
+      <Text
+        style={[
+          styles.subtitle,
+          { color: colors.secondaryText },
+        ]}
+      >
+        Join BookFinder
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="Name"
+        placeholderTextColor={colors.secondaryText}
         value={name}
         onChangeText={setName}
       />
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="Email"
+        placeholderTextColor={colors.secondaryText}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -75,8 +114,16 @@ export default function RegisterScreen({ navigation }) {
       />
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="Password"
+        placeholderTextColor={colors.secondaryText}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -89,10 +136,18 @@ export default function RegisterScreen({ navigation }) {
       )}
 
       <Pressable
-        style={styles.button}
+        style={[
+          styles.button,
+          { backgroundColor: colors.button },
+        ]}
         onPress={handleRegister}
       >
-        <Text style={styles.buttonText}>
+        <Text
+          style={[
+            styles.buttonText,
+            { color: colors.buttonText },
+          ]}
+        >
           Register
         </Text>
       </Pressable>
@@ -100,7 +155,12 @@ export default function RegisterScreen({ navigation }) {
       <Pressable
         onPress={() => navigation.navigate("Login")}
       >
-        <Text style={styles.loginText}>
+        <Text
+          style={[
+            styles.loginText,
+            { color: colors.text },
+          ]}
+        >
           Already have an account? Login
         </Text>
       </Pressable>
@@ -113,7 +173,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 24,
-    backgroundColor: "#f5f5f5",
   },
 
   title: {
@@ -130,12 +189,10 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "white",
     padding: 14,
     borderRadius: 8,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: "#ddd",
   },
 
   errorMessage: {
@@ -146,14 +203,12 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#333",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
   },
 
   buttonText: {
-    color: "white",
     fontSize: 16,
     fontWeight: "bold",
   },

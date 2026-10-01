@@ -9,12 +9,19 @@ import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import BookDetailsScreen from "./src/screens/BookDetailsScreen";
 import MainTabs from "./src/navigation/MainTabs";
+
 import { FavoritesProvider } from "./src/context/FavoritesContext";
+import {
+  ThemeProvider,
+  useTheme,
+} from "./src/context/ThemeContext";
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
+function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+  const { colors } = useTheme();
 
   useEffect(() => {
     checkLoginStatus();
@@ -22,7 +29,8 @@ export default function App() {
 
   const checkLoginStatus = async () => {
     try {
-      const loginStatus = await AsyncStorage.getItem("isLoggedIn");
+      const loginStatus =
+        await AsyncStorage.getItem("isLoggedIn");
 
       setIsLoggedIn(loginStatus === "true");
     } catch (error) {
@@ -37,6 +45,7 @@ export default function App() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
+          backgroundColor: colors.background,
         }}
       >
         <ActivityIndicator size="large" />
@@ -49,32 +58,60 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName={isLoggedIn ? "Main" : "Login"}
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: colors.card,
+            },
+            headerTintColor: colors.text,
+            headerTitleStyle: {
+              color: colors.text,
+            },
+            contentStyle: {
+              backgroundColor: colors.background,
+            },
+          }}
         >
           <Stack.Screen
             name="Login"
             component={LoginScreen}
-            options={{ headerShown: false }}
+            options={{
+              headerShown: false,
+            }}
           />
 
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
-            options={{ title: "Register" }}
+            options={{
+              title: "Register",
+            }}
           />
 
           <Stack.Screen
             name="Main"
             component={MainTabs}
-            options={{ headerShown: false }}
+            options={{
+              headerShown: false,
+            }}
           />
 
           <Stack.Screen
             name="BookDetails"
             component={BookDetailsScreen}
-            options={{ title: "Book Details" }}
+            options={{
+              title: "Book Details",
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>
     </FavoritesProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }

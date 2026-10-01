@@ -9,15 +9,25 @@ import {
 } from "react-native";
 
 import { useFavorites } from "../context/FavoritesContext";
+import { useTheme } from "../context/ThemeContext";
 
 export default function FavoritesScreen({ navigation }) {
   const { favorites, removeFavorite } = useFavorites();
+  const { colors } = useTheme();
 
   const renderBook = ({ item }) => {
     const info = item.volumeInfo;
 
     return (
-      <View style={styles.bookCard}>
+      <View
+        style={[
+          styles.bookCard,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
+      >
         <Pressable
           style={styles.bookContent}
           onPress={() =>
@@ -32,30 +42,69 @@ export default function FavoritesScreen({ navigation }) {
           )}
 
           <View style={styles.bookInfo}>
-            <Text style={styles.bookTitle}>{info.title}</Text>
+            <Text
+              style={[
+                styles.bookTitle,
+                { color: colors.text },
+              ]}
+            >
+              {info.title}
+            </Text>
 
-            <Text style={styles.author}>
+            <Text
+              style={[
+                styles.author,
+                { color: colors.secondaryText },
+              ]}
+            >
               {info.authors?.join(", ") || "Unknown author"}
             </Text>
           </View>
         </Pressable>
 
         <Pressable
-          style={styles.removeButton}
+          style={[
+            styles.removeButton,
+            { borderColor: colors.border },
+          ]}
           onPress={() => removeFavorite(item.id)}
         >
-          <Text style={styles.removeText}>Remove</Text>
+          <Text
+            style={[
+              styles.removeText,
+              { color: colors.text },
+            ]}
+          >
+            Remove
+          </Text>
         </Pressable>
       </View>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Favorites</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          { color: colors.text },
+        ]}
+      >
+        My Favorites
+      </Text>
 
       {favorites.length === 0 ? (
-        <Text style={styles.emptyText}>
+        <Text
+          style={[
+            styles.emptyText,
+            { color: colors.secondaryText },
+          ]}
+        >
           You don't have any favorite books yet.
         </Text>
       ) : (
@@ -74,7 +123,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
   },
 
   title: {
@@ -94,10 +142,10 @@ const styles = StyleSheet.create({
   },
 
   bookCard: {
-    backgroundColor: "white",
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
+    borderWidth: 1,
   },
 
   bookContent: {
@@ -131,7 +179,6 @@ const styles = StyleSheet.create({
     padding: 8,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#333",
     borderRadius: 6,
   },
 
