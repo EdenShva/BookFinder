@@ -5,8 +5,12 @@ import {
   TextInput,
   Pressable,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useTheme } from "../context/ThemeContext";
@@ -77,124 +81,170 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <View
+    <SafeAreaView
       style={[
-        styles.container,
+        styles.safeArea,
         { backgroundColor: colors.background },
       ]}
     >
-      <Text
-        style={[
-          styles.title,
-          { color: colors.text },
-        ]}
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={
+          Platform.OS === "ios" ? "padding" : "height"
+        }
       >
-        {isHebrew ? "יצירת חשבון" : "Create Account"}
-      </Text>
-
-      <Text
-        style={[
-          styles.subtitle,
-          { color: colors.secondaryText },
-        ]}
-      >
-        {isHebrew
-          ? "הצטרפי ל-BookFinder"
-          : "Join BookFinder"}
-      </Text>
-
-      <TextInput
-        style={[
-          styles.input,
-          {
-            backgroundColor: colors.card,
-            color: colors.text,
-            borderColor: colors.border,
-          },
-        ]}
-        placeholder={isHebrew ? "שם" : "Name"}
-        placeholderTextColor={colors.secondaryText}
-        value={name}
-        onChangeText={setName}
-      />
-
-      <TextInput
-        style={[
-          styles.input,
-          {
-            backgroundColor: colors.card,
-            color: colors.text,
-            borderColor: colors.border,
-          },
-        ]}
-        placeholder={isHebrew ? "אימייל" : "Email"}
-        placeholderTextColor={colors.secondaryText}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={[
-          styles.input,
-          {
-            backgroundColor: colors.card,
-            color: colors.text,
-            borderColor: colors.border,
-          },
-        ]}
-        placeholder={isHebrew ? "סיסמה" : "Password"}
-        placeholderTextColor={colors.secondaryText}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-
-      {message !== "" && (
-        <Text style={styles.errorMessage}>
-          {message}
-        </Text>
-      )}
-
-      <Pressable
-        style={[
-          styles.button,
-          { backgroundColor: colors.button },
-        ]}
-        onPress={handleRegister}
-      >
-        <Text
-          style={[
-            styles.buttonText,
-            { color: colors.buttonText },
-          ]}
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
         >
-          {isHebrew ? "הרשמה" : "Register"}
-        </Text>
-      </Pressable>
+          <View>
+            <Text
+              style={[
+                styles.title,
+                { color: colors.text },
+              ]}
+            >
+              {isHebrew
+                ? "יצירת חשבון"
+                : "Create Account"}
+            </Text>
 
-      <Pressable
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text
-          style={[
-            styles.loginText,
-            { color: colors.text },
-          ]}
-        >
-          {isHebrew
-            ? "כבר יש לך חשבון? התחברי"
-            : "Already have an account? Login"}
-        </Text>
-      </Pressable>
-    </View>
+            <Text
+              style={[
+                styles.subtitle,
+                { color: colors.secondaryText },
+              ]}
+            >
+              {isHebrew
+                ? "הצטרפי ל-BookFinder"
+                : "Join BookFinder"}
+            </Text>
+
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.card,
+                  color: colors.text,
+                  borderColor: colors.border,
+                  textAlign: isHebrew
+                    ? "right"
+                    : "left",
+                },
+              ]}
+              placeholder={isHebrew ? "שם" : "Name"}
+              placeholderTextColor={
+                colors.secondaryText
+              }
+              value={name}
+              onChangeText={setName}
+            />
+
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.card,
+                  color: colors.text,
+                  borderColor: colors.border,
+                },
+              ]}
+              placeholder={
+                isHebrew ? "אימייל" : "Email"
+              }
+              placeholderTextColor={
+                colors.secondaryText
+              }
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.card,
+                  color: colors.text,
+                  borderColor: colors.border,
+                  textAlign: isHebrew
+                    ? "right"
+                    : "left",
+                },
+              ]}
+              placeholder={
+                isHebrew ? "סיסמה" : "Password"
+              }
+              placeholderTextColor={
+                colors.secondaryText
+              }
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+
+            {message !== "" && (
+              <Text style={styles.errorMessage}>
+                {message}
+              </Text>
+            )}
+
+            <Pressable
+              style={[
+                styles.button,
+                {
+                  backgroundColor: colors.button,
+                },
+              ]}
+              onPress={handleRegister}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  {
+                    color: colors.buttonText,
+                  },
+                ]}
+              >
+                {isHebrew ? "הרשמה" : "Register"}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() =>
+                navigation.navigate("Login")
+              }
+            >
+              <Text
+                style={[
+                  styles.loginText,
+                  { color: colors.text },
+                ]}
+              >
+                {isHebrew
+                  ? "כבר יש לך חשבון? התחברי"
+                  : "Already have an account? Login"}
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
+  },
+
+  keyboardView: {
+    flex: 1,
+  },
+
+  container: {
+    flexGrow: 1,
     justifyContent: "center",
     padding: 24,
   },

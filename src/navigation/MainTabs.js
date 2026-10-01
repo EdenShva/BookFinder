@@ -10,7 +10,7 @@ import { useLanguage } from "../context/LanguageContext";
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTabs() {
+export default function MainTabs({ onLogout }) {
   const { darkMode, colors } = useTheme();
   const { language } = useLanguage();
 
@@ -61,12 +61,18 @@ export default function MainTabs() {
 
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
         options={{
           title: isHebrew ? "פרופיל" : "Profile",
           tabBarLabel: isHebrew ? "פרופיל" : "Profile",
         }}
-      />
+      >
+        {(props) => (
+          <ProfileScreen
+            {...props}
+            onLogout={onLogout}
+          />
+        )}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }

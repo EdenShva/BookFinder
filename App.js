@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import {
+  ActivityIndicator,
+  View,
+} from "react-native";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -11,6 +15,7 @@ import BookDetailsScreen from "./src/screens/BookDetailsScreen";
 import MainTabs from "./src/navigation/MainTabs";
 
 import { FavoritesProvider } from "./src/context/FavoritesContext";
+
 import {
   ThemeProvider,
   useTheme,
@@ -18,6 +23,7 @@ import {
 
 import {
   LanguageProvider,
+  useLanguage,
 } from "./src/context/LanguageContext";
 
 const Stack = createNativeStackNavigator();
@@ -26,6 +32,9 @@ function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
 
   const { colors } = useTheme();
+  const { language } = useLanguage();
+
+  const isHebrew = language === "he";
 
   useEffect(() => {
     checkLoginStatus();
@@ -40,6 +49,14 @@ function AppContent() {
     } catch (error) {
       setIsLoggedIn(false);
     }
+  };
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
   };
 
   if (isLoggedIn === null) {
@@ -61,51 +78,75 @@ function AppContent() {
     <FavoritesProvider>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName={isLoggedIn ? "Main" : "Login"}
           screenOptions={{
             headerStyle: {
               backgroundColor: colors.card,
             },
+
             headerTintColor: colors.text,
+
             headerTitleStyle: {
               color: colors.text,
             },
+
             contentStyle: {
               backgroundColor: colors.background,
             },
           }}
         >
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
+          {!isLoggedIn ? (
+            <>
+              <Stack.Screen
+                name="Login"
+                options={{
+                  headerShown: false,
+                }}
+              >
+                {(props) => (
+                  <LoginScreen
+                    {...props}
+                    onLogin={handleLogin}
+                  />
+                )}
+              </Stack.Screen>
 
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            options={{
-              title: "Register",
-            }}
-          />
+              <Stack.Screen
+                name="Register"
+                component={RegisterScreen}
+                options={{
+                  title: isHebrew
+                    ? "הרשמה"
+                    : "Register",
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Main"
+                options={{
+                  headerShown: false,
+                }}
+              >
+                {(props) => (
+                  <MainTabs
+                    {...props}
+                    onLogout={handleLogout}
+                  />
+                )}
+              </Stack.Screen>
 
-          <Stack.Screen
-            name="Main"
-            component={MainTabs}
-            options={{
-              headerShown: false,
-            }}
-          />
-
-          <Stack.Screen
-            name="BookDetails"
-            component={BookDetailsScreen}
-            options={{
-              title: "Book Details",
-            }}
-          />
+              <Stack.Screen
+                name="BookDetails"
+                component={BookDetailsScreen}
+                options={{
+                  title: isHebrew
+                    ? "פרטי הספר"
+                    : "Book Details",
+                }}
+              />
+            </>
+          )}
         </Stack.Navigator>
       </NavigationContainer>
     </FavoritesProvider>

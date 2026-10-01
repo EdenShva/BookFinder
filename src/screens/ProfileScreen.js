@@ -16,7 +16,7 @@ import { useLanguage } from "../context/LanguageContext";
 
 const USER_KEY = "registeredUser";
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileScreen({ onLogout }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -104,7 +104,7 @@ export default function ProfileScreen({ navigation }) {
       await AsyncStorage.removeItem(USER_KEY);
       await AsyncStorage.removeItem("isLoggedIn");
 
-      navigation.getParent()?.replace("Login");
+      onLogout();
     } catch (error) {
       setMessage(
         isHebrew
@@ -118,7 +118,7 @@ export default function ProfileScreen({ navigation }) {
     try {
       await AsyncStorage.removeItem("isLoggedIn");
 
-      navigation.getParent()?.replace("Login");
+      onLogout();
     } catch (error) {
       setMessage(
         isHebrew
