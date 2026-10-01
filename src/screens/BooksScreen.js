@@ -8,6 +8,7 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 
 import { searchBooks } from "../api/booksApi";
@@ -15,7 +16,10 @@ import { searchBooks } from "../api/booksApi";
 export default function BooksScreen({ navigation }) {
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState([]);
+  const [filter, setFilter] = useState("");
+
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -30,19 +34,43 @@ export default function BooksScreen({ navigation }) {
     setLoading(false);
   };
 
+  const handleRefresh = async () => {
+    if (!query.trim()) {
+      return;
+    }
+
+    setRefreshing(true);
+
+    const results = await searchBooks(query);
+
+    setBooks(results);
+
+    setRefreshing(false);
+  };
+
+  const filteredBooks = books.filter((book) => {
+    const title = book.volumeInfo.title || "";
+    const authors = book.volumeInfo.authors?.join(" ") || "";
+
+    const filterText = filter.toLowerCase();
+
+    return (
+      title.toLowerCase().includes(filterText) ||
+      authors.toLowerCase().includes(filterText)
+    );
+  });
+
   const renderBook = ({ item }) => {
     const info = item.volumeInfo;
 
     return (
       <Pressable
         style={styles.bookCard}
-        onPress={() => {
-          console.log("BOOK CLICKED:", info.title);
-
+        onPress={() =>
           navigation.navigate("BookDetails", {
             book: item,
-          });
-        }}
+          })
+        }
       >
         {info.imageLinks?.thumbnail && (
           <Image
@@ -71,7 +99,7 @@ export default function BooksScreen({ navigation }) {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Search by title or author..."
+          placeholder="Search Google Books..."
           value={query}
           onChangeText={setQuery}
           onSubmitEditing={handleSearch}
@@ -81,9 +109,20 @@ export default function BooksScreen({ navigation }) {
           style={styles.button}
           onPress={handleSearch}
         >
-          <Text style={styles.buttonText}>Search</Text>
+          <Text style={styles.buttonText}>
+            Search
+          </Text>
         </Pressable>
       </View>
+
+      {books.length > 0 && (
+        <TextInput
+          style={styles.filterInput}
+          placeholder="Filter results by title or author..."
+          value={filter}
+          onChangeText={setFilter}
+        />
+      )}
 
       {loading ? (
         <ActivityIndicator
@@ -92,10 +131,23 @@ export default function BooksScreen({ navigation }) {
         />
       ) : (
         <FlatList
-          data={books}
+          data={filteredBooks}
           keyExtractor={(item) => item.id}
           renderItem={renderBook}
           contentContainerStyle={styles.list}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+            />
+          }
+          ListEmptyComponent={
+            books.length > 0 && filter !== "" ? (
+              <Text style={styles.emptyText}>
+                No books match this filter.
+              </Text>
+            ) : null
+          }
         />
       )}
     </View>
@@ -117,7 +169,7 @@ const styles = StyleSheet.create({
 
   searchContainer: {
     flexDirection: "row",
-    marginBottom: 20,
+    marginBottom: 12,
   },
 
   input: {
@@ -142,12 +194,28 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
+  filterInput: {
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+  },
+
   loader: {
     marginTop: 40,
   },
 
   list: {
     paddingBottom: 20,
+    flexGrow: 1,
+  },
+
+  emptyText: {
+    textAlign: "center",
+    marginTop: 30,
+    fontSize: 16,
   },
 
   bookCard: {
@@ -156,7 +224,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
-    cursor: "pointer",
   },
 
   cover: {
