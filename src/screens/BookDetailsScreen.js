@@ -1,13 +1,14 @@
 import React from "react";
 import {
-  View,
   Text,
   Image,
   ScrollView,
   StyleSheet,
   Pressable,
+  View,
 } from "react-native";
 
+import * as Speech from "expo-speech";
 import { useFavorites } from "../context/FavoritesContext";
 
 export default function BookDetailsScreen({ route }) {
@@ -17,8 +18,25 @@ export default function BookDetailsScreen({ route }) {
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   const isFavorite = favorites.some(
-        (favorite) => favorite.id === book.id
-);
+    (favorite) => favorite.id === book.id
+  );
+
+  const description =
+    info.description || "No description available.";
+
+  const handleReadDescription = () => {
+    Speech.stop();
+
+    Speech.speak(description, {
+      language: "en-US",
+      rate: 0.9,
+      pitch: 1.0,
+    });
+  };
+
+  const handleStopReading = () => {
+    Speech.stop();
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -48,19 +66,41 @@ export default function BookDetailsScreen({ route }) {
       )}
 
       <Text style={styles.description}>
-        {info.description || "No description available."}
+        {description}
       </Text>
+
+      <View style={styles.speechButtons}>
+        <Pressable
+          style={styles.speechButton}
+          onPress={handleReadDescription}
+        >
+          <Text style={styles.speechButtonText}>
+            🔊 Read Description
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.stopButton}
+          onPress={handleStopReading}
+        >
+          <Text style={styles.stopButtonText}>
+            Stop Reading
+          </Text>
+        </Pressable>
+      </View>
 
       <Pressable
         style={styles.button}
         onPress={() =>
-            isFavorite
+          isFavorite
             ? removeFavorite(book.id)
             : addFavorite(book)
         }
-        >
+      >
         <Text style={styles.buttonText}>
-            {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+          {isFavorite
+            ? "Remove from Favorites"
+            : "Add to Favorites"}
         </Text>
       </Pressable>
     </ScrollView>
@@ -102,7 +142,36 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     marginTop: 20,
-    marginBottom: 25,
+    marginBottom: 20,
+  },
+
+  speechButtons: {
+    width: "100%",
+    marginBottom: 15,
+  },
+
+  speechButton: {
+    borderWidth: 1,
+    borderColor: "#333",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 8,
+  },
+
+  speechButtonText: {
+    fontWeight: "bold",
+  },
+
+  stopButton: {
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+
+  stopButtonText: {
+    fontWeight: "bold",
+    color: "#b00020",
   },
 
   button: {
